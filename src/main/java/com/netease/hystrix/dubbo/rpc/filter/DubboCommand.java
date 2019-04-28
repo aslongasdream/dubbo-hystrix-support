@@ -6,6 +6,7 @@ import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcResult;
+import com.alibaba.fastjson.JSON;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 import org.slf4j.Logger;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DubboCommand extends HystrixCommand<Result> {
 
-    private static Logger logger = LoggerFactory.getLogger(DubboCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(DubboCommand.class);
 
     private Invoker<?> invoker;
     private Invocation invocation;
@@ -29,6 +30,7 @@ public class DubboCommand extends HystrixCommand<Result> {
         this.fallbackName = fallbackName;
     }
 
+    @Override
     protected Result run() throws Exception {
         Result result = invoker.invoke(invocation);
         //如果远程调用异常，抛出异常执行降级逻辑
@@ -51,9 +53,10 @@ public class DubboCommand extends HystrixCommand<Result> {
             ExtensionLoader<Fallback> loader = ExtensionLoader.getExtensionLoader(Fallback.class);
             Fallback fallback = loader.getExtension(fallbackName);
             Object value = fallback.invoke();
+            logger.info("fallback invoke!!!, result:{}", JSON.toJSONString(value));
             return new RpcResult(value);
         } catch (RuntimeException ex) {
-            logger.error("fallback failed", ex);
+            logger.error("fallback failed:{}", ex.getMessage(), ex);
             throw ex;
         }
 

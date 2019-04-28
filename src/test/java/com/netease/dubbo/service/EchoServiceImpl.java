@@ -9,6 +9,7 @@ public class EchoServiceImpl implements EchoService {
 
     @Override
     public String echo() {
+        System.out.println("hello world");
         return "Hello World";
     }
 
@@ -19,7 +20,7 @@ public class EchoServiceImpl implements EchoService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return "Hello World";
+        return "Hello Timeout";
     }
 
     @Override

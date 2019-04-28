@@ -1,1 +1,2 @@
 hystrix=com.netease.hystrix.dubbo.rpc.filter.HystrixFilter
+fallback=com.netease.hystrix.dubbo.rpc.filter.FallbackImpl
